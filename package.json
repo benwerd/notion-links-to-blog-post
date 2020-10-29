@@ -1,0 +1,23 @@
+{
+  "name": "notion-links-to-blog-post",
+  "version": "1.0.0",
+  "description": "Turns a Notion CSV export into a blog post link roundup.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/benwerd/notion-links-to-blog-post.git"
+  },
+  "author": "Ben Werdmuller",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/benwerd/notion-links-to-blog-post/issues"
+  },
+  "homepage": "https://github.com/benwerd/notion-links-to-blog-post#readme",
+  "dependencies": {
+    "command-line-args": "^5.1.1",
+    "csv-parser": "^2.3.3"
+  }
+}
