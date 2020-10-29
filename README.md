@@ -2,6 +2,13 @@
 
 This node script takes a CSV export of a Notion link database and turns it into a markdown or HTML formatted blog post.
 
+For now, it assumes that your database contains the following:
+
+* Name: title of the page
+* URL: the page URL
+* Summary: a brief description of the link
+* Tags: a category
+
 It will export to a file _and also copy output to your clipboard_.
 
 ## Get started
