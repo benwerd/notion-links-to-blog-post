@@ -3,6 +3,7 @@
 const commandLineArgs = require('command-line-args')
 const csv = require('csv-parser')
 const fs = require('fs')
+const clipboardy = require('clipboardy')
 
 const quit = (message) => {
   console.log(message)
@@ -39,30 +40,36 @@ try {
     })
     .on('end', () => {
 
+      let output = ''
       const categories = Object.keys(links)
+      categories.sort()
+
       categories.forEach((category) => {
 
-        if (!category || !Array.isArray(links[category])) return
+        if (!category || category === 'Tags' || !Array.isArray(links[category])) return
 
         switch(cli.format) {
           case 'markdown':
-              console.log(`#### ${category}\n`)
+              output += `#### ${category}\n\n`
             break;
           case 'html':
-              console.log(`<h4>${category}</h4>\n`)
+              output += `<h4>${category}</h4>\n`
             break;
         }
 
         links[category].forEach((item) => {
           switch(cli.format) {
             case 'markdown':
-              console.log(`[${item.Name}](${item.URL}). ${item.Summary.trim()}\n`)
+              output += `[${item.Name}](${item.URL}). ${item.Summary.trim()}\n\n`
               break;
             case 'html':
-              console.log(`<p><a href="${item.URL}">${item.Name}</a>. ${item.Summary.trim()}</p>\n`)
+              output += `<p><a href="${item.URL}">${item.Name}</a>. ${item.Summary.trim()}</p>\n`
               break;
           }
         })
+
+        clipboardy.writeSync(output)
+        console.log(output)
 
       })
 
