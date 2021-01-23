@@ -12,7 +12,8 @@ const quit = (message) => {
 
 const cliOptions = [
   {name: 'input', defaultOption: true},
-  {name: 'format', defaultValue: 'markdown'}
+  {name: 'format', defaultValue: 'markdown'},
+  {name: 'start', defaultValue: '1970-1-1'},
 ]
 
 const cli = commandLineArgs(cliOptions)
@@ -27,6 +28,10 @@ try {
   const links = {}
   const headers = ['Name', 'Category', 'Created', 'Summary', 'Tags', 'URL']
 
+  // Configure minimum date
+  const start = Date.parse(cli.start)
+  if (isNaN(start)) quit(`We couldn't parse ${cli.start} as a date.`)
+
   // Open and parse CSV
   fs.createReadStream(cli.input)
     .pipe(csv({headers, skipLines: 1}))
@@ -35,6 +40,8 @@ try {
       Object.keys(data).forEach((row) => {
         item[row] = data[row]
       })
+      let parsedCreatedDate = Date.parse(item['Created'])
+      if (isNaN(parsedCreatedDate) || parsedCreatedDate < start) return
 
       if (typeof links[data['Category']] === 'undefined') links[data['Category']] = {}
       if (!Array.isArray(links[data['Category']][data['Tags']])) links[data['Category']][data['Tags']] = []
