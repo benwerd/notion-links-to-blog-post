@@ -11,8 +11,8 @@ const quit = (message) => {
 }
 
 const cliOptions = [
-  { name: 'input', defaultOption: true },
-  { name: 'format', defaultValue: 'markdown' }
+  {name: 'input', defaultOption: true},
+  {name: 'format', defaultValue: 'markdown'}
 ]
 
 const cli = commandLineArgs(cliOptions)
@@ -25,52 +25,70 @@ try {
 
   // Prepare structured data
   const links = {}
+  const headers = ['Name', 'Category', 'Created', 'Summary', 'Tags', 'URL']
 
   // Open and parse CSV
   fs.createReadStream(cli.input)
-    .pipe(csv(['Name', 'Created', 'Summary', 'Tags', 'URL']))
+    .pipe(csv({headers, skipLines: 1}))
     .on('data', (data) => {
-
       let item = {}
       Object.keys(data).forEach((row) => {
-        if (row !== 'Tags' && row !== 'Created') item[row] = data[row]
+        item[row] = data[row]
       })
-      if (!Array.isArray(links[data.Tags])) links[data['Tags']] = []
-      links[data['Tags']].push(item)
+
+      if (typeof links[data['Category']] === 'undefined') links[data['Category']] = {}
+      if (!Array.isArray(links[data['Category']][data['Tags']])) links[data['Category']][data['Tags']] = []
+      links[data['Category']][data['Tags']].push(item)
     })
     .on('end', () => {
-
       let output = ''
       const categories = Object.keys(links)
       categories.sort()
 
       categories.forEach((category) => {
-
-        if (!category || category === 'Tags' || !Array.isArray(links[category])) return
-
-        switch(cli.format) {
-          case 'markdown':
-              output += `#### ${category}\n\n`
-            break;
-          case 'html':
-              output += `<h4>${category}</h4>\n`
-            break;
-        }
-
-        links[category].forEach((item) => {
-          switch(cli.format) {
+        if (category) {
+          switch (cli.format) {
             case 'markdown':
-              output += `[${item.Name}](${item.URL}). ${item.Summary.trim()}\n\n`
+              output += `### ${category}\n\n`
               break;
             case 'html':
-              output += `<p><a href="${item.URL}">${item.Name}</a>. ${item.Summary.trim()}</p>\n`
+              output += `<h3>${category}</h3>\n`
               break;
           }
+        }
+
+        const tags = Object.keys(links[category])
+        tags.sort()
+
+        tags.forEach((tag) => {
+          if (tag === 'Tags' || !Array.isArray(links[category][tag])) return
+
+          if (tag) {
+            switch (cli.format) {
+              case 'markdown':
+                output += `#### ${tag}\n\n`
+                break
+              case 'html':
+                output += `<h4>${tag}</h4>\n`
+                break
+            }
+          }
+
+          links[category][tag].forEach((item) => {
+            switch (cli.format) {
+              case 'markdown':
+                output += `[${item.Name}](${item.URL}). ${item.Summary.trim()}\n\n`
+                break
+              case 'html':
+                output += `<p><a href="${item.URL}">${item.Name}</a>. ${item.Summary.trim()}</p>\n`
+                break
+            }
+          })
+
+          clipboardy.writeSync(output)
+          console.log(output)
+
         })
-
-        clipboardy.writeSync(output)
-        console.log(output)
-
       })
 
     })
