@@ -4,6 +4,7 @@ const commandLineArgs = require('command-line-args')
 const csv = require('csv-parser')
 const fs = require('fs')
 const clipboardy = require('clipboardy')
+const smartquotes = require('smartquotes')
 
 const quit = (message) => {
   console.log(message)
@@ -42,6 +43,14 @@ try {
       })
       let parsedCreatedDate = Date.parse(item['Created'])
       if (isNaN(parsedCreatedDate) || parsedCreatedDate < start) return
+
+      if (item['Name'].trim().length === 0) return
+
+      // Punctuate title
+      if (!['.','!','?'].includes(item['Name'].charAt(item['Name'].length - 1))) item['Name'] += '.'
+
+      // Smart quotes for description
+      item['Summary'] = smartquotes(item['Summary'])
 
       if (typeof links[data['Category']] === 'undefined') links[data['Category']] = {}
       if (!Array.isArray(links[data['Category']][data['Tags']])) links[data['Category']][data['Tags']] = []
@@ -84,10 +93,10 @@ try {
           links[category][tag].forEach((item) => {
             switch (cli.format) {
               case 'markdown':
-                output += `[${item.Name}](${item.URL}). ${item.Summary.trim()}\n\n`
+                output += `[${item.Name}](${item.URL}) ${item.Summary.trim()}\n\n`
                 break
               case 'html':
-                output += `<p><a href="${item.URL}">${item.Name}</a>. ${item.Summary.trim()}</p>\n`
+                output += `<p><a href="${item.URL}">${item.Name}</a> ${item.Summary.trim()}</p>\n`
                 break
             }
           })
