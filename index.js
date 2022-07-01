@@ -27,7 +27,7 @@ try {
 
   // Prepare structured data
   const links = {}
-  const headers = ['Name', 'Category', 'Created', 'Property', 'Summary', 'Tags', 'URL']
+
 
   // Configure minimum date
   const start = Date.parse(cli.start)
@@ -37,12 +37,14 @@ try {
 
   // Open and parse CSV
   fs.createReadStream(cli.input)
-    .pipe(csv({headers, skipLines: 1}))
+    .pipe(csv())
     .on('data', (data) => {
       let item = {}
       Object.keys(data).forEach((row) => {
         item[row] = data[row]
       })
+      
+      item['Name'] = Object.values(item)[0]
       let parsedCreatedDate = Date.parse(item['Created'])
 
       if (isNaN(parsedCreatedDate) || parsedCreatedDate < start) return
