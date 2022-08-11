@@ -5,6 +5,7 @@ const csv = require('csv-parser')
 const fs = require('fs')
 const clipboardy = require('clipboardy')
 const smartquotes = require('smartquotes')
+const stripUtm = require('strip-utm')
 
 const quit = (message) => {
   console.log(message)
@@ -96,6 +97,7 @@ try {
           }
 
           links[category][tag].forEach((item) => {
+            item.URL = stripUtm(item.URL)
             switch (cli.format) {
               case 'markdown':
                 output += `[${item.Name}](${item.URL}) ${item.Summary.trim()}\n\n`

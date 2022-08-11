@@ -20,6 +20,7 @@
     "clipboardy": "^2.3.0",
     "command-line-args": "^5.1.1",
     "csv-parser": "^2.3.3",
-    "smartquotes": "^2.3.2"
+    "smartquotes": "^2.3.2",
+    "strip-utm": "^1.0.0"
   }
 }
